@@ -37,7 +37,7 @@ end
 function [newLower, newUpper, middle] = compareBounds(lowerBound,upperBound)
 	middle = (lowerBound + upperBound)/2;
 	if myFunction(middle) == 0
-        %Root is exacty in the middle
+		%Root is exacty in the middle
 		newLower = middle;
 		newUpper = middle;
 	elseif myFunction(lowerBound) == 0
@@ -46,15 +46,15 @@ function [newLower, newUpper, middle] = compareBounds(lowerBound,upperBound)
 		newUpper = lowerBound;
 	elseif myFunction(upperBound) == 0
 		%Root is exacty in the upper bound
-        newLower = upperBound;
+		newLower = upperBound;
 		newUpper = upperBound;
 	elseif myFunction(middle) * myFunction(lowerBound) < 0
 		%Root is in the first half of segment
-        newLower = lowerBound;
+		newLower = lowerBound;
 		newUpper = middle;
-    else
-        %Root is in the second half of segment
-        newLower = middle;
+	else
+		%Root is in the second half of segment
+		newLower = middle;
 		newUpper = upperBound;
 	end
 end
@@ -62,7 +62,7 @@ end
 %Searches for a root in defined interval
 function bisection(maxError)
 	%Setup
-    fprintf("==================================================\n");
+	fprintf("==================================================\n");
 	fprintf("Aproximacion por metodo de Biseccion\n");
 	boundsA = input("Escriba el limite inferior de busqueda\n");
 	boundsB = input("Escriba el limite superior de busqueda\n");
@@ -76,10 +76,10 @@ function bisection(maxError)
 		error = relativeError(oldResult, result);
 		oldResult = result;
 		%In case the root is exact
-        if boundsA == boundsB
+		if boundsA == boundsB
 			result = boundsA;
 			error = 0;
-        end
+		end
 	end
 	fprintf("==================================================\n");
 	fprintf("Factor de friccion: %.8f\n", result);
