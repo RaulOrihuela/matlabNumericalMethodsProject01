@@ -30,44 +30,59 @@ function result = relativeError (calculated, expected)
 end
 
 %==============================================================================
-%SECANT
+%BISECTION
 %==============================================================================
 
-%Used to set bounds according to value of the function on those points
-function [xn,xn_1] = realignBounds(current, past)
-	if abs(myFunction(past)) <= abs(myFunction(current))
-		xn = past;
-		xn_1 = current;
-	else
-		xn = current;
-		xn_1 = past;
+%Used to find bounds for the next iteration
+function [newLower, newUpper, middle] = compareBounds(lowerBound,upperBound)
+	middle = (lowerBound + upperBound)/2;
+	if myFunction(middle) == 0
+        %Root is exacty in the middle
+		newLower = middle;
+		newUpper = middle;
+	elseif myFunction(lowerBound) == 0
+		%Root is exacty in the lower bound
+		newLower = lowerBound;
+		newUpper = lowerBound;
+	elseif myFunction(upperBound) == 0
+		%Root is exacty in the upper bound
+        newLower = upperBound;
+		newUpper = upperBound;
+	elseif myFunction(middle) * myFunction(lowerBound) < 0
+		%Root is in the first half of segment
+        newLower = lowerBound;
+		newUpper = middle;
+    else
+        %Root is in the second half of segment
+        newLower = middle;
+		newUpper = upperBound;
 	end
-end
-
-%Returns xn - f(xn)*[xn-1 - xn / f(xn-1) - f(xn)]
-function result = secantApproximation(currentPoint, pastPoint)
-	result = currentPoint - myFunction(currentPoint) *(pastPoint - currentPoint)/(myFunction(pastPoint) - myFunction(currentPoint));
 end
 
 %Searches for a root in defined interval
-function secantMethod()
+function bisection(maxError)
 	%Setup
-	fprintf("==================================================\n");
-	fprintf("Aproximacion por metodo de secante\n");
-	oldPoint = input("Escriba el valor de X0\n");
-	currentPoint = input("Escriba el valor de X1\n");
+    fprintf("==================================================\n");
+	fprintf("Aproximacion por metodo de Biseccion\n");
+	boundsA = input("Escriba el limite inferior de busqueda\n");
+	boundsB = input("Escriba el limite superior de busqueda\n");
+	oldResult = boundsA;
 	error = 1;
 	%Until error is within threshold
-	while error > 0.00001
-		[currentPoint, oldPoint] = realignBounds(currentPoint, oldPoint);
-		temp = secantApproximation(currentPoint, oldPoint);
-		oldPoint = currentPoint;
-		currentPoint = temp;
+	while error > maxError
+		%Getting new bounds and current result
+		[boundsA,boundsB,result] = compareBounds(boundsA,boundsB);
 		%Calculating error
-		error = relativeError(oldPoint, currentPoint);
+		error = relativeError(oldResult, result);
+		oldResult = result;
+		%In case the root is exact
+        if boundsA == boundsB
+			result = boundsA;
+			error = 0;
+        end
 	end
 	fprintf("==================================================\n");
-	fprintf("Factor de friccion: %.8f\n", currentPoint);
+	fprintf("Factor de friccion: %.8f\n", result);
 	fprintf("Error relativo (Factor de friccion): %.8f\n", error);
 end
 
@@ -110,7 +125,7 @@ function colebrookWhite()
 	relativeRoughness = Relative_Roughness(pipeRoughness, pipeDiameter);
     
 	%Process data
-	secantMethod();
+	bisection(0.00001);
 	fprintf("Numero de Reynolds: %.8f\n",reynoldsNumber);
 	fprintf("Rugosidad relativa: %.8f\n",relativeRoughness);
 	fprintf("==================================================\n");
